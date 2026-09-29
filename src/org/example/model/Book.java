@@ -58,6 +58,12 @@ public abstract class Book {
         return dateOfPurchase;
     }
     public abstract void display();
+    public void markAsBorrowed(){
+        this.status = BookStatus.BORROWED;
+    }
+    public void markAsAvailable(){
+        this.status = BookStatus.AVAILABLE;
+    }
 
     @Override
     public String toString() {

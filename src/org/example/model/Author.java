@@ -29,6 +29,9 @@ public class Author extends Person{
             System.out.println(book);
         }
     }
+    public void removeBook(Book book){
+        books.remove(book);
+    }
 
     @Override
     public void whoYouAre() {
