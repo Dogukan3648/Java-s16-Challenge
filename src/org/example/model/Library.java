@@ -167,18 +167,11 @@ public class Library {
 
         book.markAsBorrowed();
 
-        Invoice invoice = new Invoice(
-                nextInvoiceId++,
-                reader,
-                book,
-                book.getPrice(),
-                InvoiceType.BORROW
-        );
+       Invoice invoice = createInvoice(reader,book,book.getPrice(),InvoiceType.BORROW);
 
-        invoices.add(invoice);
-        activeBorrowInvoices.put(bookId, invoice);
+       activeBorrowInvoices.put(bookId,invoice);
 
-        return invoice;
+       return invoice;
     }
 
     public Invoice returnBook(long memberId, long bookId) {
@@ -209,19 +202,16 @@ public class Library {
 
         book.markAsAvailable();
 
-        Invoice refund = new Invoice(
-                nextInvoiceId++,
-                reader,
-                book,
-                borrowInvoice.getAmount(),
-                InvoiceType.REFUND
-        );
+      Invoice refund = createInvoice(reader,book,borrowInvoice.getAmount(),InvoiceType.REFUND);
 
-        invoices.add(refund);
-
-        return refund;
+      return refund;
     }
     public Reader findReaderById(long memberId){
         return readers.get(memberId);
+    }
+    private Invoice createInvoice(Reader reader, Book book,double amount, InvoiceType type){
+        Invoice invoice = new Invoice(nextInvoiceId++,reader,book,amount,type);
+        invoices.add(invoice);
+        return invoice;
     }
 }

@@ -4,6 +4,7 @@ import org.example.enums.BookStatus;
 
 import java.time.LocalDate;
 import java.util.Objects;
+import java.time.format.DateTimeFormatter;
 
 public abstract class Book {
     private long bookId;
@@ -67,6 +68,8 @@ public abstract class Book {
 
     @Override
     public String toString() {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+
         return "Book{" +
                 "bookId=" + bookId +
                 ", author='" + author.getName() + '\'' +
@@ -74,7 +77,7 @@ public abstract class Book {
                 ", price=" + price +
                 ", edition='" + edition + '\'' +
                 ", status=" + status +
-                ", dateOfPurchase=" + dateOfPurchase +
+                ", dateOfPurchase=" + dateOfPurchase.format(formatter) +
                 '}';
     }
 
