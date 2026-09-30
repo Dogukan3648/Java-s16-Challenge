@@ -3,10 +3,7 @@ package org.example.model;
 import org.example.enums.BookStatus;
 import org.example.enums.InvoiceType;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class Library {
 
@@ -16,6 +13,7 @@ public class Library {
     private List<Invoice> invoices;
     private long nextInvoiceId;
     private Map<Long, Invoice> activeBorrowInvoices;
+    private Map<String, Author> authors;
 
     public Library() {
         this.books = new HashMap<>();
@@ -24,6 +22,7 @@ public class Library {
         this.invoices = new ArrayList<>();
         this.nextInvoiceId = 1;
         this.activeBorrowInvoices = new HashMap<>();
+        this.authors = new HashMap<>();
     }
 
     public boolean addBook(Book book) {
@@ -213,5 +212,13 @@ public class Library {
         Invoice invoice = new Invoice(nextInvoiceId++,reader,book,amount,type);
         invoices.add(invoice);
         return invoice;
+    }
+    public Author findOrCreateAuthor(String authorName){
+        String key = authorName.trim().toLowerCase(Locale.ROOT);
+
+        if (!authors.containsKey(key)){
+            authors.put(key, new Author(authorName.trim()));
+        }
+        return authors.get(key);
     }
 }

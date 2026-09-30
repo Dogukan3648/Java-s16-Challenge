@@ -3,20 +3,26 @@ package org.example;
 import org.example.model.*;
 
 import java.time.LocalDate;
-import java.util.Scanner;
-import java.util.List;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.util.List;
+import java.util.Scanner;
 
 public class Main {
+
+    private static final DateTimeFormatter DATE_FORMATTER =
+            DateTimeFormatter.ofPattern("dd-MM-yyyy");
+
     public static void main(String[] args) {
+
         Scanner scanner = new Scanner(System.in);
 
         Library library = new Library();
-        Librarian librarian = new Librarian("Doğukan","1234",library);
+        Librarian librarian = new Librarian("Doğukan", "1234", library);
 
         boolean running = true;
 
-        while (running){
+        while (running) {
 
             System.out.println();
             System.out.println("===== LIBRARY SYSTEM =====");
@@ -30,55 +36,63 @@ public class Main {
             System.out.println("8 - Borrow Book");
             System.out.println("9 - Return Book");
             System.out.println("0 - Exit");
-            System.out.print("Select an option: ");
 
-            int choice = scanner.nextInt();
-            scanner.nextLine();
+            int choice = readInt(scanner, "Select an option: ");
 
-            switch (choice){
+            switch (choice) {
+
                 case 1:
-                    addBook(scanner,library);
+                    addBook(scanner, library);
                     break;
+
                 case 2:
-                    searchBook(scanner,library);
+                    searchBook(scanner, library);
                     break;
+
                 case 3:
-                    updateBook(scanner,library);
+                    updateBook(scanner, library);
                     break;
+
                 case 4:
-                    deleteBook(scanner,library);
+                    deleteBook(scanner, library);
                     break;
+
                 case 5:
-                    listBooksByCategory(scanner,library);
+                    listBooksByCategory(scanner, library);
                     break;
+
                 case 6:
-                    listBooksByAuthor(scanner,library);
+                    listBooksByAuthor(scanner, library);
                     break;
+
                 case 7:
-                    addReader(scanner,library);
+                    addReader(scanner, library);
                     break;
+
                 case 8:
-                    borrowBook(scanner,librarian);
+                    borrowBook(scanner, librarian);
                     break;
+
                 case 9:
-                    returnBook(scanner,librarian);
+                    returnBook(scanner, librarian);
                     break;
+
                 case 0:
                     running = false;
                     System.out.println("Library system closed.");
                     break;
+
                 default:
                     System.out.println("Invalid option.");
             }
         }
-        scanner.close();
 
+        scanner.close();
     }
+
     private static void addBook(Scanner scanner, Library library) {
 
-        System.out.print("Book ID: ");
-        long bookId = scanner.nextLong();
-        scanner.nextLine();
+        long bookId = readLong(scanner, "Book ID: ");
 
         System.out.print("Author name: ");
         String authorName = scanner.nextLine();
@@ -86,44 +100,55 @@ public class Main {
         System.out.print("Book title: ");
         String title = scanner.nextLine();
 
-        System.out.print("Price: ");
-        double price = scanner.nextDouble();
-        scanner.nextLine();
+        double price = readDouble(scanner, "Price: ");
 
         System.out.print("Edition: ");
         String edition = scanner.nextLine();
 
-        System.out.print("Date of purchase (DD-MM-YYYY): ");
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
-        LocalDate dateOfPurchase = LocalDate.parse(scanner.nextLine(), formatter);
+        LocalDate dateOfPurchase =
+                readDate(scanner, "Date of purchase (DD-MM-YYYY): ");
 
         System.out.println("1 - Journal");
         System.out.println("2 - Study Book");
         System.out.println("3 - Magazine");
-        System.out.print("Select category: ");
 
-        int category = scanner.nextInt();
-        scanner.nextLine();
+        int category = readInt(scanner, "Select category: ");
 
-        Author author = new Author(authorName);
+        Author author = library.findOrCreateAuthor(authorName);
         Book book;
 
         switch (category) {
+
             case 1:
                 book = new Journal(
-                        bookId, author, title, price, edition, dateOfPurchase
+                        bookId,
+                        author,
+                        title,
+                        price,
+                        edition,
+                        dateOfPurchase
                 );
                 break;
 
             case 2:
                 book = new StudyBook(
-                        bookId, author, title, price, edition, dateOfPurchase
+                        bookId,
+                        author,
+                        title,
+                        price,
+                        edition,
+                        dateOfPurchase
                 );
                 break;
 
             case 3:
                 book = new Magazine(
-                        bookId, author, title, price, edition, dateOfPurchase
+                        bookId,
+                        author,
+                        title,
+                        price,
+                        edition,
+                        dateOfPurchase
                 );
                 break;
 
@@ -140,70 +165,81 @@ public class Main {
             System.out.println("A book with this ID already exists.");
         }
     }
+
     private static void searchBook(Scanner scanner, Library library) {
 
         System.out.println("1 - Search by ID");
         System.out.println("2 - Search by Title");
         System.out.println("3 - Search by Author");
-        System.out.print("Select search type: ");
 
-        int searchType = scanner.nextInt();
-        scanner.nextLine();
+        int searchType = readInt(scanner, "Select search type: ");
 
         switch (searchType) {
+
             case 1:
-                System.out.print("Book ID: ");
-                long bookId = scanner.nextLong();
-                scanner.nextLine();
+
+                long bookId = readLong(scanner, "Book ID: ");
 
                 Book book = library.findBookById(bookId);
 
                 if (book != null) {
-                    System.out.println(book);
+                    book.display();
                 } else {
                     System.out.println("Book not found.");
                 }
+
                 break;
 
             case 2:
+
                 System.out.print("Book title: ");
                 String title = scanner.nextLine();
 
-                List<Book> booksByTitle = library.findBooksByTitle(title);
+                List<Book> booksByTitle =
+                        library.findBooksByTitle(title);
 
                 if (booksByTitle.isEmpty()) {
+
                     System.out.println("Book not found.");
+
                 } else {
+
                     for (Book currentBook : booksByTitle) {
-                        System.out.println(currentBook);
+                        currentBook.display();
                     }
                 }
+
                 break;
 
             case 3:
+
                 System.out.print("Author name: ");
                 String authorName = scanner.nextLine();
 
-                List<Book> booksByAuthor = library.findBooksByAuthor(authorName);
+                List<Book> booksByAuthor =
+                        library.findBooksByAuthor(authorName);
 
                 if (booksByAuthor.isEmpty()) {
+
                     System.out.println("Book not found.");
+
                 } else {
+
                     for (Book currentBook : booksByAuthor) {
-                        System.out.println(currentBook);
+                        currentBook.display();
                     }
                 }
+
                 break;
 
             default:
                 System.out.println("Invalid search type.");
         }
     }
+
     private static void updateBook(Scanner scanner, Library library) {
 
-        System.out.print("Book ID: ");
-        long bookId = scanner.nextLong();
-        scanner.nextLine();
+        long bookId = readLong(scanner, "Book ID: ");
 
         Book book = library.findBookById(bookId);
 
@@ -218,20 +254,12 @@ public class Main {
         System.out.print("New title: ");
         String title = scanner.nextLine();
 
-        System.out.print("New price: ");
-        double price = scanner.nextDouble();
-        scanner.nextLine();
+        double price = readDouble(scanner, "New price: ");
 
         System.out.print("New edition: ");
         String edition = scanner.nextLine();
 
-        Author author;
-
-        if (book.getAuthor().getName().equalsIgnoreCase(authorName)) {
-            author = book.getAuthor();
-        } else {
-            author = new Author(authorName);
-        }
+       Author author = library.findOrCreateAuthor(authorName);
 
         boolean updated = library.updateBook(
                 bookId,
@@ -247,11 +275,10 @@ public class Main {
             System.out.println("Book could not be updated.");
         }
     }
+
     private static void deleteBook(Scanner scanner, Library library) {
 
-        System.out.print("Book ID: ");
-        long bookId = scanner.nextLong();
-        scanner.nextLine();
+        long bookId = readLong(scanner, "Book ID: ");
 
         boolean deleted = library.removeBook(bookId);
 
@@ -261,19 +288,22 @@ public class Main {
             System.out.println("Book could not be deleted.");
         }
     }
-    private static void listBooksByCategory(Scanner scanner, Library library) {
+
+    private static void listBooksByCategory(
+            Scanner scanner,
+            Library library
+    ) {
 
         System.out.println("1 - Journal");
         System.out.println("2 - Study Book");
         System.out.println("3 - Magazine");
-        System.out.print("Select category: ");
 
-        int category = scanner.nextInt();
-        scanner.nextLine();
+        int category = readInt(scanner, "Select category: ");
 
         List<Book> books;
 
         switch (category) {
+
             case 1:
                 books = library.findBooksByCategory(Journal.class);
                 break;
@@ -297,15 +327,20 @@ public class Main {
         }
 
         for (Book book : books) {
-            System.out.println(book);
+            book.display();
         }
     }
-    private static void listBooksByAuthor(Scanner scanner, Library library) {
+
+    private static void listBooksByAuthor(
+            Scanner scanner,
+            Library library
+    ) {
 
         System.out.print("Author name: ");
         String authorName = scanner.nextLine();
 
-        List<Book> books = library.findBooksByAuthor(authorName);
+        List<Book> books =
+                library.findBooksByAuthor(authorName);
 
         if (books.isEmpty()) {
             System.out.println("No books found for this author.");
@@ -313,14 +348,16 @@ public class Main {
         }
 
         for (Book book : books) {
-            System.out.println(book);
+            book.display();
         }
     }
-    private static void addReader(Scanner scanner, Library library) {
 
-        System.out.print("Member ID: ");
-        long memberId = scanner.nextLong();
-        scanner.nextLine();
+    private static void addReader(
+            Scanner scanner,
+            Library library
+    ) {
+
+        long memberId = readLong(scanner, "Member ID: ");
 
         System.out.print("Name: ");
         String name = scanner.nextLine();
@@ -333,14 +370,14 @@ public class Main {
 
         System.out.println("1 - Student");
         System.out.println("2 - Faculty");
-        System.out.print("Select member type: ");
 
-        int memberType = scanner.nextInt();
-        scanner.nextLine();
+        int memberType =
+                readInt(scanner, "Select member type: ");
 
         MemberRecord memberRecord;
 
         switch (memberType) {
+
             case 1:
                 memberRecord = new Student(
                         memberId,
@@ -371,17 +408,22 @@ public class Main {
         if (added) {
             System.out.println("Reader added successfully.");
         } else {
-            System.out.println("A reader with this ID already exists.");
+            System.out.println(
+                    "A reader with this ID already exists."
+            );
         }
     }
-    private static void borrowBook(Scanner scanner, Librarian librarian) {
 
-        System.out.print("Member ID: ");
-        long memberId = scanner.nextLong();
+    private static void borrowBook(
+            Scanner scanner,
+            Librarian librarian
+    ) {
 
-        System.out.print("Book ID: ");
-        long bookId = scanner.nextLong();
-        scanner.nextLine();
+        long memberId =
+                readLong(scanner, "Member ID: ");
+
+        long bookId =
+                readLong(scanner, "Book ID: ");
 
         if (!librarian.verifyMember(memberId)) {
             System.out.println("Reader not found.");
@@ -393,7 +435,8 @@ public class Main {
             return;
         }
 
-        Invoice invoice = librarian.issueBook(memberId, bookId);
+        Invoice invoice =
+                librarian.issueBook(memberId, bookId);
 
         if (invoice == null) {
             System.out.println("Book could not be borrowed.");
@@ -403,14 +446,17 @@ public class Main {
         System.out.println("Book borrowed successfully.");
         librarian.createBill(invoice);
     }
-    private static void returnBook(Scanner scanner, Librarian librarian) {
 
-        System.out.print("Member ID: ");
-        long memberId = scanner.nextLong();
+    private static void returnBook(
+            Scanner scanner,
+            Librarian librarian
+    ) {
 
-        System.out.print("Book ID: ");
-        long bookId = scanner.nextLong();
-        scanner.nextLine();
+        long memberId =
+                readLong(scanner, "Member ID: ");
+
+        long bookId =
+                readLong(scanner, "Book ID: ");
 
         if (!librarian.verifyMember(memberId)) {
             System.out.println("Reader not found.");
@@ -422,7 +468,8 @@ public class Main {
             return;
         }
 
-        Invoice refund = librarian.returnBook(memberId, bookId);
+        Invoice refund =
+                librarian.returnBook(memberId, bookId);
 
         if (refund == null) {
             System.out.println("Book could not be returned.");
@@ -431,5 +478,102 @@ public class Main {
 
         System.out.println("Book returned successfully.");
         librarian.createBill(refund);
+    }
+
+    private static int readInt(
+            Scanner scanner,
+            String prompt
+    ) {
+
+        while (true) {
+
+            System.out.print(prompt);
+
+            try {
+
+                return Integer.parseInt(
+                        scanner.nextLine().trim()
+                );
+
+            } catch (NumberFormatException e) {
+
+                System.out.println(
+                        "Please enter a valid number."
+                );
+            }
+        }
+    }
+
+    private static long readLong(
+            Scanner scanner,
+            String prompt
+    ) {
+
+        while (true) {
+
+            System.out.print(prompt);
+
+            try {
+
+                return Long.parseLong(
+                        scanner.nextLine().trim()
+                );
+
+            } catch (NumberFormatException e) {
+
+                System.out.println(
+                        "Please enter a valid number."
+                );
+            }
+        }
+    }
+
+    private static double readDouble(
+            Scanner scanner,
+            String prompt
+    ) {
+
+        while (true) {
+
+            System.out.print(prompt);
+
+            try {
+
+                return Double.parseDouble(
+                        scanner.nextLine().trim()
+                );
+
+            } catch (NumberFormatException e) {
+
+                System.out.println(
+                        "Please enter a valid number."
+                );
+            }
+        }
+    }
+
+    private static LocalDate readDate(
+            Scanner scanner,
+            String prompt
+    ) {
+
+        while (true) {
+
+            System.out.print(prompt);
+
+            try {
+
+                return LocalDate.parse(
+                        scanner.nextLine().trim(),
+                        DATE_FORMATTER
+                );
+
+            } catch (DateTimeParseException e) {
+
+                System.out.println(
+                        "Please enter the date as DD-MM-YYYY."
+                );
+            }
+        }
     }
 }

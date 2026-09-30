@@ -39,4 +39,12 @@ public class Reader extends Person{
     public void whoYouAre() {
         System.out.println("I am a reader.");
     }
+
+    @Override
+    public String toString() {
+        return "Reader{" +
+                "memberId=" + memberRecord.getMemberId() +
+                ", name='" + getName() + '\'' +
+                '}';
+    }
 }
